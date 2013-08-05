@@ -123,6 +123,15 @@ public class SmoothLogic
             case BlockTypes.HULL_COLOR_GREEN_ID: return BlockTypes.HULL_COLOR_WEDGE_GREEN_ID; 
             case BlockTypes.HULL_COLOR_YELLOW_ID: return BlockTypes.HULL_COLOR_WEDGE_YELLOW_ID; 
             case BlockTypes.HULL_COLOR_WHITE_ID: return BlockTypes.HULL_COLOR_WEDGE_WHITE_ID; 
+            case BlockTypes.POWERHULL_COLOR_GREY: return BlockTypes.POWERHULL_COLOR_WEDGE_GREY; 
+            case BlockTypes.POWERHULL_COLOR_PURPLE: return BlockTypes.POWERHULL_COLOR_WEDGE_PURPLE; 
+            case BlockTypes.POWERHULL_COLOR_BROWN: return BlockTypes.POWERHULL_COLOR_WEDGE_BROWN; 
+            case BlockTypes.POWERHULL_COLOR_BLACK: return BlockTypes.POWERHULL_COLOR_WEDGE_BLACK; 
+            case BlockTypes.POWERHULL_COLOR_RED: return BlockTypes.POWERHULL_COLOR_WEDGE_RED; 
+            case BlockTypes.POWERHULL_COLOR_BLUE: return BlockTypes.POWERHULL_COLOR_WEDGE_BLUE; 
+            case BlockTypes.POWERHULL_COLOR_GREEN: return BlockTypes.POWERHULL_COLOR_WEDGE_GREEN; 
+            //case BlockTypes.POWERHULL_COLOR_YELLOW: return BlockTypes.POWERHULL_COLOR_WEDGE_YELLOW; 
+            case BlockTypes.POWERHULL_COLOR_WHITE: return BlockTypes.POWERHULL_COLOR_WEDGE_WHITE; 
 
         }
         return type1;
@@ -135,8 +144,8 @@ public class SmoothLogic
         if (!grid.contains(p2))
             return false;
         short type = grid.get(p2).getBlockID();
-        if (BlockTypes.isWedge(type))
+        if (BlockTypes.isWedge(type) || BlockTypes.isPowerWedge(type))
             return false;
-        return BlockTypes.isHull(type);
+        return BlockTypes.isHull(type) || BlockTypes.isPowerHull(type);
     }
 }

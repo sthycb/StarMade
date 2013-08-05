@@ -61,9 +61,9 @@ public class RenderLogic
             if (!blocks.contains(p))
                 continue;
             Block b = blocks.get(p);
-            if (BlockTypes.isCorner(b.getBlockID()))
+            if (BlockTypes.isCorner(b.getBlockID()) || BlockTypes.isPowerCorner(b.getBlockID()))
                 doCorner(blocks, p, polys);
-            else if (BlockTypes.isWedge(b.getBlockID()))
+            else if (BlockTypes.isWedge(b.getBlockID()) || BlockTypes.isPowerWedge(b.getBlockID()))
                 doWedge(blocks, p, polys);
             else
                doCube(blocks, p, polys);

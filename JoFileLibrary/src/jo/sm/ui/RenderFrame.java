@@ -26,6 +26,7 @@ import jo.sm.logic.StarMadeLogic;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Data;
 import jo.sm.ship.logic.DataLogic;
+import jo.sm.ship.logic.HullLogic;
 import jo.sm.ship.logic.ShipLogic;
 import jo.sm.ship.logic.SmoothLogic;
 import jo.sm.ui.logic.ShipSpec;
@@ -45,12 +46,19 @@ public class RenderFrame extends JFrame implements WindowListener
         JButton openExisting = new JButton("Open...");
         JButton openFile = new JButton("Open File...");
         JButton smooth = new JButton("Smooth");
+        smooth.setToolTipText("Smooth hull outline by adding wedges between right angle intersections of blocks");
+        JButton power = new JButton("Harden");
+        power.setToolTipText("Convert all unhardened hull blocks to hardened hull blocks");
+        JButton unpower = new JButton("Soften");
+        unpower.setToolTipText("Convert all hardened hull blocks to unhardened hull blocks");
         // layout
         JPanel buttonBar = new JPanel();
         buttonBar.setLayout(new GridLayout(1,6));
         buttonBar.add(openExisting);
         buttonBar.add(openFile);
         buttonBar.add(smooth);
+        buttonBar.add(power);
+        buttonBar.add(unpower);
         getContentPane().add(BorderLayout.NORTH, buttonBar);
         getContentPane().add(BorderLayout.WEST, new EditPanel(mClient));
         getContentPane().add(BorderLayout.CENTER, mClient);
@@ -76,6 +84,20 @@ public class RenderFrame extends JFrame implements WindowListener
             public void actionPerformed(ActionEvent ev)
             {
                 doSmooth();
+            }            
+        });
+        power.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doPower();
+            }            
+        });
+        unpower.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doUnpower();
             }            
         });
         setSize(1024, 768);
@@ -125,6 +147,24 @@ public class RenderFrame extends JFrame implements WindowListener
        if (grid == null)
            return;
        SmoothLogic.smooth(grid);
+       mClient.setGrid(grid);
+    }
+
+    private void doPower()
+    {
+       SparseMatrix<Block> grid = mClient.getGrid();
+       if (grid == null)
+           return;
+       HullLogic.power(grid);
+       mClient.setGrid(grid);
+    }
+
+    private void doUnpower()
+    {
+       SparseMatrix<Block> grid = mClient.getGrid();
+       if (grid == null)
+           return;
+       HullLogic.unpower(grid);
        mClient.setGrid(grid);
     }
 
