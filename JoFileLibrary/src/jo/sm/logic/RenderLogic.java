@@ -30,6 +30,7 @@ public class RenderLogic
     private static void getBasicPolys(SparseMatrix<Block> blocks,
             Point3i upper, Point3i lower, List<RenderTile> polys)
     {
+        /*
         for (int z = lower.z; z <= upper.z; z++)
         {
             System.out.println("Z="+z);
@@ -41,12 +42,10 @@ public class RenderLogic
                 for (int x = lower.x; x <= upper.x; x++)
                 {
                     Block b = blocks.get(x, y, z);
-                    /*
-                    if (b == null)
-                        System.out.print(" ------------------------");
-                    else
-                        System.out.print(" "+b.getOrientation()+":"+StringUtils.zeroPrefix(Integer.toBinaryString(b.getBitfield()), 24));
-                        */
+//                    if (b == null)
+//                        System.out.print(" ------------------------");
+//                    else
+//                        System.out.print(" "+b.getOrientation()+":"+StringUtils.zeroPrefix(Integer.toBinaryString(b.getBitfield()), 24));
                     if (b == null)
                         System.out.print(" --");
                     else
@@ -55,6 +54,7 @@ public class RenderLogic
                 System.out.println();
             }
         }
+        */
         for (CubeIterator i = new CubeIterator(lower, upper); i.hasNext(); )
         {
             Point3i p = i.next();

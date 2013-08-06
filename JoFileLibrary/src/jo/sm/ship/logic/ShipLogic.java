@@ -95,4 +95,9 @@ public class ShipLogic
 //        v.b += mod.b*16*16;
 //        v.c += mod.c*16*16;
     }
+    
+    public static Map<Point3i, Data> getData(SparseMatrix<Block> blocks)
+    {
+        return null;
+    }
 }

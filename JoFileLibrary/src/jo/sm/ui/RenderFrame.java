@@ -36,6 +36,7 @@ import jo.vecmath.Point3i;
 @SuppressWarnings("serial")
 public class RenderFrame extends JFrame implements WindowListener
 {
+    private ShipSpec    mSpec;
     private RenderPanel mClient;
 
     public RenderFrame()
@@ -45,6 +46,7 @@ public class RenderFrame extends JFrame implements WindowListener
         mClient = new RenderPanel();
         JButton openExisting = new JButton("Open...");
         JButton openFile = new JButton("Open File...");
+        JButton save = new JButton("Save");
         JButton smooth = new JButton("Smooth");
         smooth.setToolTipText("Smooth hull outline by adding wedges between right angle intersections of blocks");
         JButton power = new JButton("Harden");
@@ -53,9 +55,10 @@ public class RenderFrame extends JFrame implements WindowListener
         unpower.setToolTipText("Convert all hardened hull blocks to unhardened hull blocks");
         // layout
         JPanel buttonBar = new JPanel();
-        buttonBar.setLayout(new GridLayout(1,6));
+        buttonBar.setLayout(new GridLayout(1,7));
         buttonBar.add(openExisting);
         buttonBar.add(openFile);
+        buttonBar.add(save);
         buttonBar.add(smooth);
         buttonBar.add(power);
         buttonBar.add(unpower);
@@ -77,6 +80,13 @@ public class RenderFrame extends JFrame implements WindowListener
             public void actionPerformed(ActionEvent ev)
             {
                 doOpenFile();
+            }            
+        });
+        save.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doSave();
             }            
         });
         smooth.addActionListener(new ActionListener(){
@@ -112,7 +122,10 @@ public class RenderFrame extends JFrame implements WindowListener
             return;
         SparseMatrix<Block> grid = ShipTreeLogic.loadShip(spec);
         if (grid != null)
+        {
+            mSpec = spec;
             mClient.setGrid(grid);
+        }
     }
 
     private void doOpenFile()
@@ -132,6 +145,9 @@ public class RenderFrame extends JFrame implements WindowListener
                Map<Point3i, Data> data = new HashMap<Point3i, Data>();
                data.put(new Point3i(), datum);
                SparseMatrix<Block> grid = ShipLogic.getBlocks(data);
+               mSpec = new ShipSpec();
+               mSpec.setType(ShipSpec.FILE);
+               mSpec.setFile(smb2);
                mClient.setGrid(grid);
            }
            catch (IOException e)
@@ -139,6 +155,19 @@ public class RenderFrame extends JFrame implements WindowListener
                e.printStackTrace();
            }
         }
+    }
+    
+    private void doSave()
+    {
+        if (mSpec == null)
+            return;
+        if (mSpec.getType() == ShipSpec.FILE)
+            doSaveFile();
+    }
+    
+    private void doSaveFile()
+    {
+        
     }
 
     private void doSmooth()
