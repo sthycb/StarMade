@@ -26,6 +26,7 @@ import jo.sm.logic.StarMadeLogic;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Data;
 import jo.sm.ship.logic.DataLogic;
+import jo.sm.ship.logic.HullLogic;
 import jo.sm.ship.logic.ShipLogic;
 import jo.sm.ship.logic.SmoothLogic;
 import jo.sm.ui.logic.ShipSpec;
@@ -35,6 +36,7 @@ import jo.vecmath.Point3i;
 @SuppressWarnings("serial")
 public class RenderFrame extends JFrame implements WindowListener
 {
+    private ShipSpec    mSpec;
     private RenderPanel mClient;
 
     public RenderFrame()
@@ -44,13 +46,22 @@ public class RenderFrame extends JFrame implements WindowListener
         mClient = new RenderPanel();
         JButton openExisting = new JButton("Open...");
         JButton openFile = new JButton("Open File...");
+        JButton save = new JButton("Save");
         JButton smooth = new JButton("Smooth");
+        smooth.setToolTipText("Smooth hull outline by adding wedges between right angle intersections of blocks");
+        JButton power = new JButton("Harden");
+        power.setToolTipText("Convert all unhardened hull blocks to hardened hull blocks");
+        JButton unpower = new JButton("Soften");
+        unpower.setToolTipText("Convert all hardened hull blocks to unhardened hull blocks");
         // layout
         JPanel buttonBar = new JPanel();
-        buttonBar.setLayout(new GridLayout(1,6));
+        buttonBar.setLayout(new GridLayout(1,7));
         buttonBar.add(openExisting);
         buttonBar.add(openFile);
+        buttonBar.add(save);
         buttonBar.add(smooth);
+        buttonBar.add(power);
+        buttonBar.add(unpower);
         getContentPane().add(BorderLayout.NORTH, buttonBar);
         getContentPane().add(BorderLayout.WEST, new EditPanel(mClient));
         getContentPane().add(BorderLayout.CENTER, mClient);
@@ -71,11 +82,32 @@ public class RenderFrame extends JFrame implements WindowListener
                 doOpenFile();
             }            
         });
+        save.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doSave();
+            }            
+        });
         smooth.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent ev)
             {
                 doSmooth();
+            }            
+        });
+        power.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doPower();
+            }            
+        });
+        unpower.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent ev)
+            {
+                doUnpower();
             }            
         });
         setSize(1024, 768);
@@ -90,7 +122,10 @@ public class RenderFrame extends JFrame implements WindowListener
             return;
         SparseMatrix<Block> grid = ShipTreeLogic.loadShip(spec);
         if (grid != null)
+        {
+            mSpec = spec;
             mClient.setGrid(grid);
+        }
     }
 
     private void doOpenFile()
@@ -110,6 +145,9 @@ public class RenderFrame extends JFrame implements WindowListener
                Map<Point3i, Data> data = new HashMap<Point3i, Data>();
                data.put(new Point3i(), datum);
                SparseMatrix<Block> grid = ShipLogic.getBlocks(data);
+               mSpec = new ShipSpec();
+               mSpec.setType(ShipSpec.FILE);
+               mSpec.setFile(smb2);
                mClient.setGrid(grid);
            }
            catch (IOException e)
@@ -118,6 +156,40 @@ public class RenderFrame extends JFrame implements WindowListener
            }
         }
     }
+    
+    private void doSave()
+    {
+        if (mSpec == null)
+            return;
+        if (mSpec.getType() == ShipSpec.FILE)
+            doSaveFile();
+        else if (mSpec.getType() == ShipSpec.ENTITY)
+            doSaveEntity();
+    }
+    
+    private void doSaveFile()
+    {
+        
+    }
+    
+    private void doSaveEntity()
+    {
+        System.out.println("Saving "+mSpec.getName());
+        SparseMatrix<Block> grid = mClient.getGrid();
+        Map<Point3i, Data> data = ShipLogic.getData(grid);
+        File baseDir = new File(mSpec.getEntity().getFile().getParentFile(), "DATA");
+        String baseName = mSpec.getEntity().getFile().getName();
+        System.out.println("Saving "+mSpec.getEntity().getFile().toString());
+        baseName = baseName.substring(0, baseName.length() - 4); // remove .ent
+        try
+        {
+            DataLogic.writeFiles(data, baseDir, baseName);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }        
+    }
 
     private void doSmooth()
     {
@@ -125,6 +197,24 @@ public class RenderFrame extends JFrame implements WindowListener
        if (grid == null)
            return;
        SmoothLogic.smooth(grid);
+       mClient.setGrid(grid);
+    }
+
+    private void doPower()
+    {
+       SparseMatrix<Block> grid = mClient.getGrid();
+       if (grid == null)
+           return;
+       HullLogic.power(grid);
+       mClient.setGrid(grid);
+    }
+
+    private void doUnpower()
+    {
+       SparseMatrix<Block> grid = mClient.getGrid();
+       if (grid == null)
+           return;
+       HullLogic.unpower(grid);
        mClient.setGrid(grid);
     }
 

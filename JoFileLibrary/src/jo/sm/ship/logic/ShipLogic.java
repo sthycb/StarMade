@@ -1,5 +1,9 @@
 package jo.sm.ship.logic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import jo.sm.data.CubeIterator;
@@ -70,6 +74,22 @@ public class ShipLogic
         }
     }
     
+    public static void dumpChunks(Map<Point3i, Data> data)
+    {
+        for (Point3i p : data.keySet())
+        {
+            Data datum = data.get(p);
+            Point3i lower = new Point3i();
+            Point3i upper = new Point3i();
+            getBounds(datum, lower, upper);
+            System.out.println("Datum: "+p+", "+lower+" -- "+upper);
+            for (Chunk c : datum.getChunks())
+            {
+                System.out.println("  Chunk: "+c.getPosition()+", type="+c.getType());
+            }
+        }
+    }
+    
     public static SparseMatrix<Block> getBlocks(Map<Point3i, Data> data)
     {
         SparseMatrix<Block> blocks = new SparseMatrix<Block>();
@@ -94,5 +114,50 @@ public class ShipLogic
 //        v.a += mod.a*16*16;
 //        v.b += mod.b*16*16;
 //        v.c += mod.c*16*16;
+    }
+    
+    public static Map<Point3i, Data> getData(SparseMatrix<Block> blocks)
+    {
+        long now = System.currentTimeMillis();
+        Map<Point3i, Data> data = new HashMap<Point3i, Data>();
+        Point3i lowerUniverse = new Point3i();
+        Point3i upperUniverse = new Point3i();
+        blocks.getBounds(lowerUniverse, upperUniverse);
+        Point3i lowerData = new Point3i((lowerUniverse.x + 128)/256, (lowerUniverse.y + 128)/256, (lowerUniverse.z + 128)/256);
+        Point3i upperData = new Point3i((upperUniverse.x + 128)/256, (upperUniverse.y + 128)/256, (upperUniverse.z + 128)/256);
+        for (Iterator<Point3i> i = new CubeIterator(lowerData, upperData); i.hasNext(); )
+        {
+            Point3i p = i.next();
+            Data datum = new Data();
+            Point3i lowerChunk = new Point3i(p.x*256 - 128, p.y*256 - 128, p.z*256 - 128);
+            Point3i upperChunk = new Point3i(lowerChunk.x + 255, lowerChunk.y + 255, lowerChunk.z + 255);
+            List<Chunk> chunks = new ArrayList<Chunk>();
+            for (Iterator<Point3i> j = new CubeIterator(lowerChunk, upperChunk, new Point3i(16, 16, 16)); j.hasNext(); )
+            {
+                Point3i q = j.next();
+                Chunk chunk = new Chunk();
+                chunk.setPosition(q);
+                chunk.setBlocks(new Block[16][16][16]);
+                chunk.setTimestamp(now);
+                chunk.setType(1);
+                boolean doneAny = false;
+                for (Iterator<Point3i> k = new CubeIterator(new Point3i(), new Point3i(15, 15, 15)); k.hasNext(); )
+                {
+                    Point3i r = k.next();
+                    Block b = blocks.get(q.x + r.x, q.y + r.y, q.z + r.z);
+                    if (b == null)
+                        continue;
+                    chunk.getBlocks()[r.x][r.y][r.z] = b;
+                    doneAny = true;
+                }
+                if (doneAny)
+                    chunks.add(chunk);
+            }
+            if (chunks.size() == 0)
+                continue;
+            datum.setChunks(chunks.toArray(new Chunk[0]));
+            data.put(p,  datum);
+        }
+        return data;
     }
 }

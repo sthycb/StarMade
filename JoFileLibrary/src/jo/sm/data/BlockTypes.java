@@ -881,55 +881,134 @@ public class BlockTypes
         BLOCK_ABBR.put(DECORATIVE_PANEL_4, "D");
         BLOCK_ABBR.put(LIGHT_BULB_YELLOW, "L");
     }
+    
+    public static final int HULL_COLORS = 0;
+    public static final int WEDGE_COLORS = 1;
+    public static final int CORNER_COLORS = 2;
+    public static final int POWERHULL_COLORS = 3;
+    public static final int POWERWEDGE_COLORS = 4;
+    public static final int POWERCORNER_COLORS = 5;
+    
+    public static short[][] HULL_COLOR_MAP = {
+    	{ 	// hulls
+	        HULL_COLOR_GREY_ID,
+	        HULL_COLOR_PURPLE_ID,
+	        HULL_COLOR_BROWN_ID,
+	        HULL_COLOR_BLACK_ID,
+	        HULL_COLOR_RED_ID,
+	        HULL_COLOR_BLUE_ID,
+	        HULL_COLOR_GREEN_ID,
+	        HULL_COLOR_YELLOW_ID,
+	        HULL_COLOR_WHITE_ID,
+		},
+		{ 	// wedges
+	        HULL_COLOR_WEDGE_GREY_ID, 
+	        HULL_COLOR_WEDGE_PURPLE_ID, 
+	        HULL_COLOR_WEDGE_BROWN_ID, 
+	        HULL_COLOR_WEDGE_BLACK_ID, 
+	        HULL_COLOR_WEDGE_RED_ID, 
+	        HULL_COLOR_WEDGE_BLUE_ID, 
+	        HULL_COLOR_WEDGE_GREEN_ID, 
+	        HULL_COLOR_WEDGE_YELLOW_ID, 
+	        HULL_COLOR_WEDGE_WHITE_ID, 
+		},
+		{ 	// corners
+	        HULL_COLOR_CORNER_GREY_ID, 
+	        HULL_COLOR_CORNER_PURPLE_ID, 
+	        HULL_COLOR_CORNER_BROWN_ID, 
+	        HULL_COLOR_CORNER_BLACK_ID, 
+	        HULL_COLOR_CORNER_RED_ID, 
+	        HULL_COLOR_CORNER_BLUE_ID, 
+	        HULL_COLOR_CORNER_GREEN_ID, 
+	        HULL_COLOR_CORNER_YELLOW_ID, 
+	        HULL_COLOR_CORNER_WHITE_ID, 
+		},
+    	{ 	// power hulls
+	        POWERHULL_COLOR_GREY,
+	        POWERHULL_COLOR_PURPLE,
+	        POWERHULL_COLOR_BROWN,
+	        POWERHULL_COLOR_BLACK,
+	        POWERHULL_COLOR_RED,
+	        POWERHULL_COLOR_BLUE,
+	        POWERHULL_COLOR_GREEN,
+	        -1,
+	        POWERHULL_COLOR_WHITE,
+		},
+    	{ 	// power wedges
+	        POWERHULL_COLOR_WEDGE_GREY, 
+	        POWERHULL_COLOR_WEDGE_PURPLE, 
+	        POWERHULL_COLOR_WEDGE_BROWN, 
+	        POWERHULL_COLOR_WEDGE_BLACK, 
+	        POWERHULL_COLOR_WEDGE_RED, 
+	        POWERHULL_COLOR_WEDGE_BLUE, 
+	        POWERHULL_COLOR_WEDGE_GREEN, 
+	        -1, 
+	        POWERHULL_COLOR_WEDGE_WHITE, 
+		},
+    	{ 	// power corners
+	        POWERHULL_COLOR_CORNER_GREY, 
+	        POWERHULL_COLOR_CORNER_PURPLE, 
+	        POWERHULL_COLOR_CORNER_BROWN, 
+	        POWERHULL_COLOR_CORNER_BLACK, 
+	        POWERHULL_COLOR_CORNER_RED, 
+	        POWERHULL_COLOR_CORNER_BLUE, 
+	        POWERHULL_COLOR_CORNER_GREEN, 
+	        -1, 
+	        POWERHULL_COLOR_CORNER_WHITE, 
+    	},
+    };
+    
+    private static int indexOf(short[] array, short val)
+    {
+    	for (int i = 0; i < array.length; i++)
+    		if (array[i] == val)
+    			return i;
+    	return -1;
+    }
+    
     public static boolean isHull(short blockID)
     {
-        switch (blockID)
-        {
-                case HULL_COLOR_GREY_ID:
-                case HULL_COLOR_PURPLE_ID:
-                case HULL_COLOR_BROWN_ID:
-                case HULL_COLOR_BLACK_ID:
-                case HULL_COLOR_RED_ID:
-                case HULL_COLOR_BLUE_ID:
-                case HULL_COLOR_GREEN_ID:
-                case HULL_COLOR_YELLOW_ID:
-                case HULL_COLOR_WHITE_ID:
-                    return true;
-        }
-        return false;
+    	return indexOf(HULL_COLOR_MAP[HULL_COLORS], blockID) >= 0;
     }
     public static boolean isWedge(short blockID)
     {
-        switch (blockID)
-        {
-            case HULL_COLOR_WEDGE_GREY_ID: 
-            case HULL_COLOR_WEDGE_PURPLE_ID: 
-            case HULL_COLOR_WEDGE_BROWN_ID: 
-            case HULL_COLOR_WEDGE_BLACK_ID: 
-            case HULL_COLOR_WEDGE_RED_ID: 
-            case HULL_COLOR_WEDGE_BLUE_ID: 
-            case HULL_COLOR_WEDGE_GREEN_ID: 
-            case HULL_COLOR_WEDGE_YELLOW_ID: 
-            case HULL_COLOR_WEDGE_WHITE_ID: 
-                    return true;
-        }
-        return false;
+    	return indexOf(HULL_COLOR_MAP[WEDGE_COLORS], blockID) >= 0;
     }
     public static boolean isCorner(short blockID)
     {
-        switch (blockID)
-        {
-            case HULL_COLOR_CORNER_GREY_ID: 
-            case HULL_COLOR_CORNER_PURPLE_ID: 
-            case HULL_COLOR_CORNER_BROWN_ID: 
-            case HULL_COLOR_CORNER_BLACK_ID: 
-            case HULL_COLOR_CORNER_RED_ID: 
-            case HULL_COLOR_CORNER_BLUE_ID: 
-            case HULL_COLOR_CORNER_GREEN_ID: 
-            case HULL_COLOR_CORNER_YELLOW_ID: 
-            case HULL_COLOR_CORNER_WHITE_ID: 
-                    return true;
-        }
-        return false;
+    	return indexOf(HULL_COLOR_MAP[CORNER_COLORS], blockID) >= 0;
+    }
+    public static boolean isPowerHull(short blockID)
+    {
+    	return indexOf(HULL_COLOR_MAP[POWERHULL_COLORS], blockID) >= 0;
+    }
+    public static boolean isPowerWedge(short blockID)
+    {
+    	return indexOf(HULL_COLOR_MAP[POWERWEDGE_COLORS], blockID) >= 0;
+    }
+    public static boolean isPowerCorner(short blockID)
+    {
+    	return indexOf(HULL_COLOR_MAP[POWERCORNER_COLORS], blockID) >= 0;
+    }
+    
+    public static short getColoredBlock(short blockID, short colorID)
+    {
+    	int idx = indexOf(HULL_COLOR_MAP[HULL_COLORS], colorID);
+    	if (idx < 0)
+    		throw new IllegalArgumentException("Color must be a hull ID: "+colorID);
+    	short newBlockID = -1;
+    	if (isHull(blockID))
+    		newBlockID = HULL_COLOR_MAP[HULL_COLORS][idx];
+    	else if (isWedge(blockID))
+    		newBlockID = HULL_COLOR_MAP[WEDGE_COLORS][idx];
+    	else if (isCorner(blockID))
+    		newBlockID = HULL_COLOR_MAP[CORNER_COLORS][idx];
+    	else if (isPowerHull(blockID))
+    		newBlockID = HULL_COLOR_MAP[POWERHULL_COLORS][idx];
+    	else if (isPowerWedge(blockID))
+    		newBlockID = HULL_COLOR_MAP[POWERWEDGE_COLORS][idx];
+    	else if (isPowerCorner(blockID))
+    		newBlockID = HULL_COLOR_MAP[POWERCORNER_COLORS][idx];
+    	return newBlockID;
     }
 }

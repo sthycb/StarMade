@@ -30,6 +30,7 @@ public class RenderLogic
     private static void getBasicPolys(SparseMatrix<Block> blocks,
             Point3i upper, Point3i lower, List<RenderTile> polys)
     {
+        /*
         for (int z = lower.z; z <= upper.z; z++)
         {
             System.out.println("Z="+z);
@@ -41,12 +42,10 @@ public class RenderLogic
                 for (int x = lower.x; x <= upper.x; x++)
                 {
                     Block b = blocks.get(x, y, z);
-                    /*
-                    if (b == null)
-                        System.out.print(" ------------------------");
-                    else
-                        System.out.print(" "+b.getOrientation()+":"+StringUtils.zeroPrefix(Integer.toBinaryString(b.getBitfield()), 24));
-                        */
+//                    if (b == null)
+//                        System.out.print(" ------------------------");
+//                    else
+//                        System.out.print(" "+b.getOrientation()+":"+StringUtils.zeroPrefix(Integer.toBinaryString(b.getBitfield()), 24));
                     if (b == null)
                         System.out.print(" --");
                     else
@@ -55,15 +54,16 @@ public class RenderLogic
                 System.out.println();
             }
         }
+        */
         for (CubeIterator i = new CubeIterator(lower, upper); i.hasNext(); )
         {
             Point3i p = i.next();
             if (!blocks.contains(p))
                 continue;
             Block b = blocks.get(p);
-            if (BlockTypes.isCorner(b.getBlockID()))
+            if (BlockTypes.isCorner(b.getBlockID()) || BlockTypes.isPowerCorner(b.getBlockID()))
                 doCorner(blocks, p, polys);
-            else if (BlockTypes.isWedge(b.getBlockID()))
+            else if (BlockTypes.isWedge(b.getBlockID()) || BlockTypes.isPowerWedge(b.getBlockID()))
                 doWedge(blocks, p, polys);
             else
                doCube(blocks, p, polys);

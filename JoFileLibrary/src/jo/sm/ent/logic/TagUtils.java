@@ -38,6 +38,18 @@ public class TagUtils {
 				System.out.print(prefix);
 				break;
 			}
+            case SERIALIZABLE:
+            {
+                System.out.println();
+                Tag[] val = (Tag[])obj.getValue();
+                for (int i = 0; i < val.length; i++)
+                    if (val[i].getType() == TagType.FINISH)
+                        break;
+                    else
+                        dump(val[i], prefix+"  ");
+                System.out.print(prefix);
+                break;
+            }
 			default:
 				if (obj.getValue() == null)
 					System.out.print("<null>");

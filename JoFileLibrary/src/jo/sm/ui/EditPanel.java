@@ -155,9 +155,10 @@ public class EditPanel extends JPanel
             Block block = grid.get(coords);
             if (block == null)
                 continue;
-            if (BlockTypes.isHull(block.getBlockID()))
+            short newID = BlockTypes.getColoredBlock(block.getBlockID(), mCurrentBlockID);
+            if (newID != -1)
             {
-                block.setBlockID(mCurrentBlockID);
+                block.setBlockID(newID);
             }
         }
         mRenderer.repaint();
@@ -170,9 +171,10 @@ public class EditPanel extends JPanel
         RenderTile tile = mRenderer.getTileAt(x, y);
         if (tile == null)
             return;
-        if (BlockTypes.isHull(tile.getBlock().getBlockID()))
+        short newID = BlockTypes.getColoredBlock(tile.getBlock().getBlockID(), mCurrentBlockID);
+        if (newID != -1)
         {
-            tile.getBlock().setBlockID(mCurrentBlockID);
+            tile.getBlock().setBlockID(newID);
             mRenderer.repaint();
         }
     }

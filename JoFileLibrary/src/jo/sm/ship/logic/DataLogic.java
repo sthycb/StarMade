@@ -7,6 +7,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -147,10 +148,13 @@ public class DataLogic
                     {
                         Block b = chunk.getBlocks()[x][y][z];
                         int bitfield = 0;
-                        bitfield |= ((b.getBlockID()&0x7ff)<<0);
-                        bitfield |= ((b.getHitPoints()&0x1ff)<<11);
-                        bitfield |= ((b.getOrientation()&0x8)<<(20-3));
-                        bitfield |= ((b.getOrientation()&0x7)<<21);
+                        if (b != null)
+                        {
+                            bitfield |= ((b.getBlockID()&0x7ff)<<0);
+                            bitfield |= ((b.getHitPoints()&0x1ff)<<11);
+                            bitfield |= ((b.getOrientation()&0x8)<<(20-3));
+                            bitfield |= ((b.getOrientation()&0x7)<<21);
+                        }
                         dos3.write(fromUnsignedInt(bitfield));
                     }
             dos3.flush();
@@ -241,5 +245,22 @@ public class DataLogic
         for (int i = 0; i < l; i++)
             v = (v<<8) | (bytes[o + i]&0xff);
         return (int)v;
+    }
+
+    public static void writeFiles(Map<Point3i, Data> data, File baseDir,
+            String baseName) throws IOException
+    {
+        for (Point3i p : data.keySet())
+        {
+            File dataFile = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2");
+            if (dataFile.exists())
+            {
+                File dest = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2.bak");
+                if (dest.exists())
+                    dest.delete();
+                dataFile.renameTo(dest);
+            }
+            writeFile(data.get(p), new FileOutputStream(dataFile), true);
+        }        
     }
 }

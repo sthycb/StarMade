@@ -110,6 +110,7 @@ public class ShipTreeLogic
             {
                 Entity e = spec.getEntity();
                 EntityLogic.readEntityData(e);
+                ShipLogic.dumpChunks(e.getData());
                 SparseMatrix<Block> grid = ShipLogic.getBlocks(e.getData());
                 e.setData(null); // conserve memory
                 return grid;

@@ -5,7 +5,7 @@ import jo.vecmath.Point3i;
 public class Chunk
 {
     private long        mTimestamp;
-    private Point3i    mPosition;
+    private Point3i     mPosition;
     private int         mType;
     private Block[][][] mBlocks;
     public long getTimestamp()
