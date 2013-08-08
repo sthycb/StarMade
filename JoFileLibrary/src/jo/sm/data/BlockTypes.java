@@ -1011,4 +1011,32 @@ public class BlockTypes
     		newBlockID = HULL_COLOR_MAP[POWERCORNER_COLORS][idx];
     	return newBlockID;
     }
+    
+    public static short getPoweredBlock(short blockID)
+    {
+    	int idx = indexOf(HULL_COLOR_MAP[HULL_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[POWERHULL_COLORS][idx];
+    	idx = indexOf(HULL_COLOR_MAP[WEDGE_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[POWERWEDGE_COLORS][idx];
+    	idx = indexOf(HULL_COLOR_MAP[CORNER_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[POWERCORNER_COLORS][idx];
+    	return -1;
+    }
+    
+    public static short getUnPoweredBlock(short blockID)
+    {
+    	int idx = indexOf(HULL_COLOR_MAP[POWERHULL_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[HULL_COLORS][idx];
+    	idx = indexOf(HULL_COLOR_MAP[POWERWEDGE_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[WEDGE_COLORS][idx];
+    	idx = indexOf(HULL_COLOR_MAP[POWERCORNER_COLORS], blockID);
+    	if (idx >= 0)
+    		return HULL_COLOR_MAP[CORNER_COLORS][idx];
+    	return -1;
+    }
 }
