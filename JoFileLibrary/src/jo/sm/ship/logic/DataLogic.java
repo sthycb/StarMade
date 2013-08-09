@@ -15,9 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import jo.sm.data.BlockTypes;
+import jo.sm.logic.ByteUtils;
+import jo.sm.logic.FileUtils;
 import jo.sm.logic.IOLogic;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Chunk;
@@ -44,6 +48,7 @@ public class DataLogic
     
     public static Data readFile(InputStream is, boolean close) throws IOException
 	{
+        System.out.println("Reading...");
 		DataInputStream dis;
 		if (is instanceof DataInputStream)
 			dis = (DataInputStream)is;
@@ -76,11 +81,13 @@ public class DataLogic
             chunk.setPosition(IOLogic.readPoint3i(dis2));
             chunk.setType(dis2.readByte());
             int compressedLen = dis2.readInt();
-            //System.out.println("CompressedLen="+compressedLen);
+            System.out.println("Chunk "+chunk.getPosition());
+            System.out.println("CompressedLen="+compressedLen);
             byte[] compressedData = new byte[compressedLen];
             dis2.readFully(compressedData);
             DataInputStream dis3 = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(compressedData)));
             Block[][][] blocks = new Block[16][16][16];
+            int blockCount = 0;
             byte[] inbuf = new byte[3];
             for (int z = 0; z < 16; z++)
                 for (int y = 0; y < 16; y++)
@@ -95,7 +102,14 @@ public class DataLogic
                         blocks[x][y][z].setOrientation((short)(((bitfield>>21)&0x7)
                                 | ((bitfield>>(20-3))&0x8)));
                         blocks[x][y][z].setBitfield(bitfield);
+                        if (BlockTypes.isHull(blocks[x][y][z].getBlockID()))
+                            System.out.println("  Block "+Integer.toHexString(bitfield)
+                                    +" (id="+ blocks[x][y][z].getBlockID()+", hp="+ blocks[x][y][z].getHitPoints()+")"
+                                    +" "+ByteUtils.toString(inbuf));
+                        if (bitfield != 0)
+                            blockCount++;
                     }
+            System.out.println("Block count="+blockCount);
             chunk.setBlocks(blocks);
             chunks.add(chunk);
         }
@@ -126,6 +140,7 @@ public class DataLogic
     
     public static void writeFile(Data data, OutputStream os, boolean close) throws IOException
     {
+        System.out.println("Writing...");
         DataOutputStream dos;
         if (os instanceof DataOutputStream)
             dos = (DataOutputStream)os;
@@ -140,8 +155,10 @@ public class DataLogic
         for (int i = 0; i < data.getChunks().length; i++)
         {
             Chunk chunk = data.getChunks()[i];
+            System.out.println("Chunk "+chunk.getPosition());
             ByteArrayOutputStream baos3 = new ByteArrayOutputStream();
             DataOutputStream dos3 = new DataOutputStream(new DeflaterOutputStream(baos3));
+            int blockCount = 0;
             for (int z = 0; z < 16; z++)
                 for (int y = 0; y < 16; y++)
                     for (int x = 0; x < 16; x++)
@@ -154,15 +171,22 @@ public class DataLogic
                             bitfield |= ((b.getHitPoints()&0x1ff)<<11);
                             bitfield |= ((b.getOrientation()&0x8)<<(20-3));
                             bitfield |= ((b.getOrientation()&0x7)<<21);
+                            blockCount++;
+                            if (BlockTypes.isHull(b.getBlockID()))
+                                System.out.println("  Block "+Integer.toHexString(bitfield)
+                                        +" (id="+b.getBlockID()+", hp="+b.getHitPoints()+")"
+                                        +" "+ByteUtils.toString(fromUnsignedInt(bitfield)));
                         }
                         dos3.write(fromUnsignedInt(bitfield));
                     }
-            dos3.flush();
+            dos3.close();
             byte[] compressedData = baos3.toByteArray();
+            System.out.println("Block count="+blockCount);
 
             dos2.writeLong(chunk.getTimestamp());
             IOLogic.write(dos2, chunk.getPosition());
-            dos.writeByte(chunk.getType());
+            dos2.writeByte(chunk.getType());
+            System.out.println("CompressedLen="+compressedData.length);
             dos2.writeInt(compressedData.length);
             dos2.write(compressedData);
             for (int j = 25 + compressedData.length; j < 5120; j++)
@@ -222,14 +246,12 @@ public class DataLogic
 
     private static byte[] fromUnsignedInt(int i)
     {
-        byte[] outbuf = new byte[4];
-        outbuf[0] = (byte)(i&0xff);
+        byte[] outbuf = new byte[3];
+        outbuf[2] = (byte)(i&0xff);
         i >>= 8;
         outbuf[1] = (byte)(i&0xff);
         i >>= 8;
-        outbuf[2] = (byte)(i&0xff);
-        i >>= 8;
-        outbuf[3] = (byte)(i&0xff);
+        outbuf[0] = (byte)(i&0xff);
         return outbuf;
     }
     
@@ -253,6 +275,39 @@ public class DataLogic
         for (Point3i p : data.keySet())
         {
             File dataFile = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2");
+            // TEST
+            byte[] original = FileUtils.readFile(dataFile.toString());
+            String oTxt = ByteUtils.toStringDump(original);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            writeFile(data.get(p), baos, true);
+            byte[] save = baos.toByteArray();
+            String sTxt = ByteUtils.toStringDump(save);
+            if (oTxt.equals(sTxt))
+                System.out.println("Identical");
+            else
+            {
+                StringTokenizer oST = new StringTokenizer(oTxt, "\r\n");
+                StringTokenizer sST = new StringTokenizer(sTxt, "\r\n");
+                while (oST.hasMoreTokens())
+                {
+                    String oLine = oST.nextToken();
+                    String sLine = sST.nextToken();
+                    if (!oLine.equals(sLine))
+                    {
+                        System.out.println("O: "+oLine);
+                        System.out.println("S: "+sLine);
+                    }
+                }
+            }
+            try
+            {
+                readFile(new ByteArrayInputStream(save), true);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return;
+            }
             if (dataFile.exists())
             {
                 File dest = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2.bak");
