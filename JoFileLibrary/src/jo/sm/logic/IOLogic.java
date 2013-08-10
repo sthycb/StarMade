@@ -51,4 +51,79 @@ public class IOLogic
         dos.writeFloat(v.y);
         dos.writeFloat(v.z);
     }
+    public static void readFully(DataInputStream dis, int[] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            arr[i] = dis.readInt();
+    }
+    public static void readFully(DataInputStream dis, int[][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void readFully(DataInputStream dis, int[][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void readFully(DataInputStream dis, int[][][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void readFully(DataInputStream dis, long[] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            arr[i] = dis.readLong();
+    }
+    public static void readFully(DataInputStream dis, long[][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void readFully(DataInputStream dis, long[][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void readFully(DataInputStream dis, long[][][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            readFully(dis, arr[i]);
+    }
+    public static void write(DataOutputStream dos, long[] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            dos.writeLong(arr[i]);
+    }
+    public static void write(DataOutputStream dos, long[][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            write(dos, arr[i]);
+    }
+    public static void write(DataOutputStream dos, long[][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            write(dos, arr[i]);
+    }
+    public static void write(DataOutputStream dos, int[] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            dos.writeInt(arr[i]);
+    }
+    public static void write(DataOutputStream dos, int[][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            write(dos, arr[i]);
+    }
+    public static void write(DataOutputStream dos, int[][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            write(dos, arr[i]);
+    }
+    public static void write(DataOutputStream dos, int[][][][] arr) throws IOException
+    {
+        for (int i = 0; i < arr.length; i++)
+            write(dos, arr[i]);
+    }
 }

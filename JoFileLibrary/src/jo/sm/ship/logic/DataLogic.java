@@ -15,11 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import jo.sm.data.BlockTypes;
 import jo.sm.logic.ByteUtils;
 import jo.sm.logic.FileUtils;
 import jo.sm.logic.IOLogic;
@@ -48,7 +46,7 @@ public class DataLogic
     
     public static Data readFile(InputStream is, boolean close) throws IOException
 	{
-        System.out.println("Reading...");
+        //System.out.println("Reading...");
 		DataInputStream dis;
 		if (is instanceof DataInputStream)
 			dis = (DataInputStream)is;
@@ -56,11 +54,11 @@ public class DataLogic
 			dis = new DataInputStream(is);
 		Data data = new Data();
 		data.setUnknown1(dis.readInt());
-		byte[] unknown2 = new byte[32768];
-		dis.readFully(unknown2);
+		int[][][][] offsetSizeTable = new int[16][16][16][2];
+		IOLogic.readFully(dis, offsetSizeTable);
 		//data.setOffsetSizeTable(unknown2);
-        byte[] unknown3 = new byte[32768];
-        dis.readFully(unknown3);
+        long[][][] timestampTable = new long[16][16][16];
+        IOLogic.readFully(dis, timestampTable);
         //data.setTimestampTable(unknown3);
         List<Chunk> chunks = new ArrayList<Chunk>();
         for (;;)
@@ -81,13 +79,13 @@ public class DataLogic
             chunk.setPosition(IOLogic.readPoint3i(dis2));
             chunk.setType(dis2.readByte());
             int compressedLen = dis2.readInt();
-            System.out.println("Chunk "+chunk.getPosition());
-            System.out.println("CompressedLen="+compressedLen);
+            //System.out.println("Chunk "+chunk.getPosition());
+            //System.out.println("CompressedLen="+compressedLen);
             byte[] compressedData = new byte[compressedLen];
             dis2.readFully(compressedData);
             DataInputStream dis3 = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(compressedData)));
             Block[][][] blocks = new Block[16][16][16];
-            int blockCount = 0;
+            //int blockCount = 0;
             byte[] inbuf = new byte[3];
             for (int z = 0; z < 16; z++)
                 for (int y = 0; y < 16; y++)
@@ -102,14 +100,14 @@ public class DataLogic
                         blocks[x][y][z].setOrientation((short)(((bitfield>>21)&0x7)
                                 | ((bitfield>>(20-3))&0x8)));
                         blocks[x][y][z].setBitfield(bitfield);
-                        if (BlockTypes.isHull(blocks[x][y][z].getBlockID()))
-                            System.out.println("  Block "+Integer.toHexString(bitfield)
-                                    +" (id="+ blocks[x][y][z].getBlockID()+", hp="+ blocks[x][y][z].getHitPoints()+")"
-                                    +" "+ByteUtils.toString(inbuf));
-                        if (bitfield != 0)
-                            blockCount++;
+                        //if (BlockTypes.isHull(blocks[x][y][z].getBlockID()))
+                        //    System.out.println("  Block "+Integer.toHexString(bitfield)
+                        //            +" (id="+ blocks[x][y][z].getBlockID()+", hp="+ blocks[x][y][z].getHitPoints()+")"
+                        //            +" "+ByteUtils.toString(inbuf));
+                        //if (bitfield != 0)
+                        //    blockCount++;
                     }
-            System.out.println("Block count="+blockCount);
+            //System.out.println("Block count="+blockCount);
             chunk.setBlocks(blocks);
             chunks.add(chunk);
         }
@@ -117,24 +115,20 @@ public class DataLogic
         if (close)
             dis.close();
         // cross check
-        /*
-        DataInputStream dis4 = new DataInputStream(new ByteArrayInputStream(data.getUnknown2()));
-        DataInputStream dis5 = new DataInputStream(new ByteArrayInputStream(data.getUnknown3()));
-        for (int z = 0; z < 16; z++)
-            for (int y = 0; y < 16; y++)
-                for (int x = 0; x < 16; x++)
-                {
-                    int off = dis4.readInt();
-                    int siz = dis4.readInt();
-                    long ts = dis5.readLong();
-                    if (off < 0)
-                        continue;
-                    System.out.print(off+" x"+siz+" ");
-                    Chunk chunk = data.getChunks()[off];
-                    System.out.println("idx="+x+","+y+","+z+" -> "+chunk.getPosition());
-                    System.out.println("     "+ts+" -> "+chunk.getTimestamp());
-                }
-                */
+//        for (int z = 0; z < 16; z++)
+//            for (int y = 0; y < 16; y++)
+//                for (int x = 0; x < 16; x++)
+//                {
+//                    int off = offsetSizeTable[x][y][z][0];
+//                    int siz = offsetSizeTable[x][y][z][1];
+//                    long ts = timestampTable[x][y][z];
+//                    if (off < 0)
+//                        continue;
+//                    System.out.print(off+" x"+siz+" ");
+//                    Chunk chunk = data.getChunks()[off];
+//                    System.out.println("idx="+x+","+y+","+z+" -> "+chunk.getPosition());
+//                    System.out.println("     "+ts+" -> "+chunk.getTimestamp());
+//                }
 		return data;
 	}
     
@@ -146,19 +140,23 @@ public class DataLogic
             dos = (DataOutputStream)os;
         else
             dos = new DataOutputStream(os);
-        dos.writeInt(0); // non-comrpessed header
+        dos.writeInt(0); // non-compressed header
 
-        Integer[][][] chunkLength = new Integer[16][16][16];
-        Integer[][][] chunkIndex = new Integer[16][16][16]; 
+        int[][][][] offsetSizeTable = new int[16][16][16][2];
+        for (int z = 0; z < 16; z++)
+            for (int y = 0; y < 16; y++)
+                for (int x = 0; x < 16; x++)
+                    offsetSizeTable[x][y][z][0] = -1;
+        long[][][] timestampTable = new long[16][16][16];
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
         DataOutputStream dos2 = new DataOutputStream(baos2);
         for (int i = 0; i < data.getChunks().length; i++)
         {
             Chunk chunk = data.getChunks()[i];
-            System.out.println("Chunk "+chunk.getPosition());
+            //System.out.println("Chunk "+chunk.getPosition());
             ByteArrayOutputStream baos3 = new ByteArrayOutputStream();
             DataOutputStream dos3 = new DataOutputStream(new DeflaterOutputStream(baos3));
-            int blockCount = 0;
+            //int blockCount = 0;
             for (int z = 0; z < 16; z++)
                 for (int y = 0; y < 16; y++)
                     for (int x = 0; x < 16; x++)
@@ -171,73 +169,39 @@ public class DataLogic
                             bitfield |= ((b.getHitPoints()&0x1ff)<<11);
                             bitfield |= ((b.getOrientation()&0x8)<<(20-3));
                             bitfield |= ((b.getOrientation()&0x7)<<21);
-                            blockCount++;
-                            if (BlockTypes.isHull(b.getBlockID()))
-                                System.out.println("  Block "+Integer.toHexString(bitfield)
-                                        +" (id="+b.getBlockID()+", hp="+b.getHitPoints()+")"
-                                        +" "+ByteUtils.toString(fromUnsignedInt(bitfield)));
+//                            blockCount++;
+//                            if (BlockTypes.isHull(b.getBlockID()))
+//                                System.out.println("  Block "+Integer.toHexString(bitfield)
+//                                        +" (id="+b.getBlockID()+", hp="+b.getHitPoints()+")"
+//                                        +" "+ByteUtils.toString(fromUnsignedInt(bitfield)));
                         }
                         dos3.write(fromUnsignedInt(bitfield));
                     }
             dos3.close();
             byte[] compressedData = baos3.toByteArray();
-            System.out.println("Block count="+blockCount);
+            //System.out.println("Block count="+blockCount);
 
             dos2.writeLong(chunk.getTimestamp());
             IOLogic.write(dos2, chunk.getPosition());
             dos2.writeByte(chunk.getType());
-            System.out.println("CompressedLen="+compressedData.length);
+            //System.out.println("CompressedLen="+compressedData.length);
             dos2.writeInt(compressedData.length);
             dos2.write(compressedData);
             for (int j = 25 + compressedData.length; j < 5120; j++)
                 dos2.writeByte(0);
-            int cx;
-            if (chunk.getPosition().x < 0)
-                cx = Math.abs(16 - chunk.getPosition().x)%16;
-            else
-                cx = chunk.getPosition().x%15;
-            int cy;
-            if (chunk.getPosition().y < 0)
-                cy = Math.abs(16 - chunk.getPosition().y)%16;
-            else
-                cy = chunk.getPosition().y%15;
-            int cz;
-            if (chunk.getPosition().z < 0)
-                cz = Math.abs(16 - chunk.getPosition().z)%16;
-            else
-                cz = chunk.getPosition().z%15;
-            chunkLength[cx][cy][cz] = 25 + compressedData.length;
-            chunkIndex[cx][cy][cz] = i;
+            int cx = chunk.getPosition().x/16 + 8;
+            int cy = chunk.getPosition().y/16 + 8;
+            int cz = chunk.getPosition().z/16 + 8;
+            offsetSizeTable[cx][cy][cz][1] = 25 + compressedData.length;
+            offsetSizeTable[cx][cy][cz][0] = i;
+            timestampTable[cx][cy][cz] = chunk.getTimestamp();
+            //System.out.println("  idx="+cx+","+cy+","+cz);
         }
         dos2.flush();
 
         // chunk index
-        for (int z = 0; z < 16; z++)
-            for (int y = 0; y < 16; y++)
-                for (int x = 0; x < 16; x++)
-                {
-                    if (chunkIndex[x][y][z] == null)
-                    {
-                        dos.writeInt(-1);
-                        dos.writeInt(0);
-                    }
-                    else
-                    {
-                        dos.writeInt(chunkIndex[x][y][z]);
-                        dos.writeInt(chunkLength[x][y][z]);
-                    }
-                }
-        // chunk times
-        for (int z = 0; z < 16; z++)
-            for (int y = 0; y < 16; y++)
-                for (int x = 0; x < 16; x++)
-                {
-                    if (chunkIndex[x][y][z] == null)
-                        dos.writeLong(0);
-                    else
-                        dos.writeLong(data.getChunks()[chunkIndex[x][y][z]].getTimestamp());
-                }
-
+        IOLogic.write(dos,  offsetSizeTable);
+        IOLogic.write(dos, timestampTable);
         dos.write(baos2.toByteArray());
         
         if (close)
@@ -284,6 +248,7 @@ public class DataLogic
             String sTxt = ByteUtils.toStringDump(save);
             if (oTxt.equals(sTxt))
                 System.out.println("Identical");
+            /*
             else
             {
                 StringTokenizer oST = new StringTokenizer(oTxt, "\r\n");
@@ -299,6 +264,7 @@ public class DataLogic
                     }
                 }
             }
+            */
             try
             {
                 readFile(new ByteArrayInputStream(save), true);
