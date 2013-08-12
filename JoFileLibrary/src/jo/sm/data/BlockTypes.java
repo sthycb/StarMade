@@ -1039,4 +1039,12 @@ public class BlockTypes
     		return HULL_COLOR_MAP[CORNER_COLORS][idx];
     	return -1;
     }
+
+    public static boolean isAnyHull(short blockID)
+    {
+        if (isHull(blockID) || isCorner(blockID) || isWedge(blockID) 
+                || isPowerHull(blockID) || isPowerCorner(blockID) || isPowerWedge(blockID))
+            return true;
+        return false;
+    }
 }

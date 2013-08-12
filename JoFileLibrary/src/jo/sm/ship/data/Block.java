@@ -8,6 +8,19 @@ public class Block
     private short   mOrientation;
     private int     mBitfield;
     
+    public Block()
+    {
+    }
+    
+    public Block(Block b)
+    {
+        mBlockID = b.mBlockID;
+        mActive = b.mActive;
+        mHitPoints = b.mHitPoints;
+        mOrientation = b.mOrientation;
+        mBitfield = b.mBitfield;
+    }
+    
     public short getBlockID()
     {
         return mBlockID;

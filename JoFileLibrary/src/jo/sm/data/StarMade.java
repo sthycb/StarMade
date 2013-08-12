@@ -9,6 +9,7 @@ public class StarMade
     private List<String>    mBlueprints;
     private List<String>    mDefaultBlueprints;
     private List<Entity>    mEntities;
+    private ClassLoader     mModLoader;
     
     public File getBaseDir()
     {
@@ -41,5 +42,13 @@ public class StarMade
     public void setEntities(List<Entity> entities)
     {
         mEntities = entities;
+    }
+    public ClassLoader getModLoader()
+    {
+        return mModLoader;
+    }
+    public void setModLoader(ClassLoader modLoader)
+    {
+        mModLoader = modLoader;
     }
 }
