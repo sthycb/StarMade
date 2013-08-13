@@ -17,6 +17,9 @@ import java.util.Properties;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -29,6 +32,7 @@ import jo.sm.ship.logic.DataLogic;
 import jo.sm.ship.logic.HullLogic;
 import jo.sm.ship.logic.ShipLogic;
 import jo.sm.ship.logic.SmoothLogic;
+import jo.sm.ui.act.OpenExistingAction;
 import jo.sm.ui.logic.ShipSpec;
 import jo.sm.ui.logic.ShipTreeLogic;
 import jo.vecmath.Point3i;
@@ -37,28 +41,37 @@ import jo.vecmath.Point3i;
 public class RenderFrame extends JFrame implements WindowListener
 {
     private ShipSpec    mSpec;
+    
     private RenderPanel mClient;
 
     public RenderFrame()
     {
         super("StarMade Ship Preview");
         // instantiate
-        mClient = new RenderPanel();
-        JButton openExisting = new JButton("Open...");
-        JButton openFile = new JButton("Open File...");
-        JButton save = new JButton("Save");
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenuItem openExisting = new JMenuItem("Open...");
+        JMenuItem openFile = new JMenuItem("Open File...");
+        JMenuItem save = new JMenuItem("Save");
         JButton smooth = new JButton("Smooth");
         smooth.setToolTipText("Smooth hull outline by adding wedges between right angle intersections of blocks");
         JButton power = new JButton("Harden");
         power.setToolTipText("Convert all unhardened hull blocks to hardened hull blocks");
         JButton unpower = new JButton("Soften");
         unpower.setToolTipText("Convert all hardened hull blocks to unhardened hull blocks");
+        mClient = new RenderPanel();
         // layout
+        setJMenuBar(menuBar);
+        menuBar.add(menuFile);
+        menuFile.add(openExisting);
+        menuFile.add(openFile);
+        menuFile.add(save);
+        menuFile.add(new OpenExistingAction());
         JPanel buttonBar = new JPanel();
-        buttonBar.setLayout(new GridLayout(1,7));
-        buttonBar.add(openExisting);
-        buttonBar.add(openFile);
-        buttonBar.add(save);
+        buttonBar.setLayout(new GridLayout(1,4));
+        //buttonBar.add(openExisting);
+        //buttonBar.add(openFile);
+        //buttonBar.add(save);
         buttonBar.add(smooth);
         buttonBar.add(power);
         buttonBar.add(unpower);

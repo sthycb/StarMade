@@ -931,7 +931,7 @@ public class BlockTypes
 	        POWERHULL_COLOR_RED,
 	        POWERHULL_COLOR_BLUE,
 	        POWERHULL_COLOR_GREEN,
-	        -1,
+	        POWERHULL_COLOR_GOLD,
 	        POWERHULL_COLOR_WHITE,
 		},
     	{ 	// power wedges
@@ -942,7 +942,7 @@ public class BlockTypes
 	        POWERHULL_COLOR_WEDGE_RED, 
 	        POWERHULL_COLOR_WEDGE_BLUE, 
 	        POWERHULL_COLOR_WEDGE_GREEN, 
-	        -1, 
+	        POWERHULL_COLOR_WEDGE_GOLD, 
 	        POWERHULL_COLOR_WEDGE_WHITE, 
 		},
     	{ 	// power corners
@@ -953,7 +953,7 @@ public class BlockTypes
 	        POWERHULL_COLOR_CORNER_RED, 
 	        POWERHULL_COLOR_CORNER_BLUE, 
 	        POWERHULL_COLOR_CORNER_GREEN, 
-	        -1, 
+	        POWERHULL_COLOR_CORNER_GOLD, 
 	        POWERHULL_COLOR_CORNER_WHITE, 
     	},
     };
