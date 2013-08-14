@@ -2,20 +2,39 @@ package jo.sm.ui.act;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JMenu;
+import jo.sm.data.SparseMatrix;
+import jo.sm.ship.data.Block;
+import jo.sm.ui.RenderFrame;
+import jo.sm.ui.ShipChooser;
+import jo.sm.ui.logic.ShipSpec;
+import jo.sm.ui.logic.ShipTreeLogic;
 
-public class OpenExistingAction extends AbstractAction
+@SuppressWarnings("serial")
+public class OpenExistingAction extends GenericAction
 {
-    public OpenExistingAction()
+    private RenderFrame mFrame;
+    
+    public OpenExistingAction(RenderFrame frame)
     {
-        setValue(Action.NAME, "Open...");
+        mFrame = frame;
+        setName("Open...");
+        setToolTipText("Open an existing data object");
     }
 
     @Override
     public void actionPerformed(ActionEvent ev)
     {
+        ShipChooser chooser = new ShipChooser(mFrame);
+        chooser.setVisible(true);
+        ShipSpec spec = chooser.getSelected();
+        if (spec == null)
+            return;
+        SparseMatrix<Block> grid = ShipTreeLogic.loadShip(spec);
+        if (grid != null)
+        {
+            mFrame.setSpec(spec);
+            mFrame.getClient().setGrid(grid);
+        }
     }
 
 }
