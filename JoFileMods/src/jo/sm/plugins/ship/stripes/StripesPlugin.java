@@ -7,11 +7,15 @@ import jo.sm.mods.IBlocksPlugin;
 import jo.sm.ship.data.Block;
 import jo.vecmath.Point3i;
 
-public class StripesPlugins implements IBlocksPlugin
+public class StripesPlugin implements IBlocksPlugin
 {
     public static final String NAME = "Stripes";
     public static final String DESC = "Paint your ship with stripes or checkerboards.";
     public static final String AUTH = "Jo Jaquinta";
+    public static final int[][] CLASSIFICATIONS = 
+        {
+        { TYPE_SHIP, SUBTYPE_SHIP_PAINT },
+        };
 
     @Override
     public String getName()
@@ -38,15 +42,9 @@ public class StripesPlugins implements IBlocksPlugin
     }
 
     @Override
-    public int getType()
+    public int[][] getClassifications()
     {
-        return TYPE_SHIP;
-    }
-
-    @Override
-    public int getSubType()
-    {
-        return SUBTYPE_SHIP_PAINT;
+        return CLASSIFICATIONS;
     }
 
     @Override
@@ -67,8 +65,9 @@ public class StripesPlugins implements IBlocksPlugin
             if (!BlockTypes.isAnyHull(b.getBlockID()))
                 continue;
             b = modify(xyz, b, params);
+            modified.set(xyz, b);
         }
-        return original;
+        return modified;
     }
 
     private Block modify(Point3i xyz, Block b, StripesParameters params)

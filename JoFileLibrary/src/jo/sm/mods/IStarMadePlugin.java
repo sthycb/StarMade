@@ -6,6 +6,5 @@ public interface IStarMadePlugin
     public String getDescription();
     public String getAuthor();
     public Object getParameterBean();
-    public int    getType();
-    public int    getSubType();
+    public int[][] getClassifications(); // list of type, subtypes
 }

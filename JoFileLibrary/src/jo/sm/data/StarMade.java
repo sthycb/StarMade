@@ -1,7 +1,10 @@
 package jo.sm.data;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+
+import jo.sm.mods.IBlocksPlugin;
 
 public class StarMade
 {
@@ -10,6 +13,12 @@ public class StarMade
     private List<String>    mDefaultBlueprints;
     private List<Entity>    mEntities;
     private ClassLoader     mModLoader;
+    private List<IBlocksPlugin> mBlocksPlugins;
+    
+    public StarMade()
+    {
+        mBlocksPlugins = new ArrayList<IBlocksPlugin>();
+    }
     
     public File getBaseDir()
     {
@@ -50,5 +59,13 @@ public class StarMade
     public void setModLoader(ClassLoader modLoader)
     {
         mModLoader = modLoader;
+    }
+    public List<IBlocksPlugin> getBlocksPlugins()
+    {
+        return mBlocksPlugins;
+    }
+    public void setBlocksPlugins(List<IBlocksPlugin> blocksPlugins)
+    {
+        mBlocksPlugins = blocksPlugins;
     }
 }
