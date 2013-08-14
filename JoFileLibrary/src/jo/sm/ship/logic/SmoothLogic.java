@@ -3,7 +3,6 @@ package jo.sm.ship.logic;
 import java.util.Iterator;
 
 import jo.sm.data.BlockTypes;
-import jo.sm.data.CubeIterator;
 import jo.sm.data.RenderTile;
 import jo.sm.data.SparseMatrix;
 import jo.sm.ship.data.Block;
@@ -22,11 +21,8 @@ public class SmoothLogic
     
     public static void smooth(SparseMatrix<Block> grid)
     {
-        Point3i lower = new Point3i();
-        Point3i upper = new Point3i();
-        grid.getBounds(lower, upper);
         boolean[] edges = new boolean[6];
-        for (Iterator<Point3i> i = new CubeIterator(lower, upper); i.hasNext(); )
+        for (Iterator<Point3i> i = grid.iterator(); i.hasNext(); )
         {
             Point3i p = i.next();
             if (grid.contains(p))

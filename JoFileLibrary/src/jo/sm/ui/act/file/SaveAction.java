@@ -1,4 +1,4 @@
-package jo.sm.ui.act;
+package jo.sm.ui.act.file;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -11,6 +11,7 @@ import jo.sm.ship.data.Data;
 import jo.sm.ship.logic.DataLogic;
 import jo.sm.ship.logic.ShipLogic;
 import jo.sm.ui.RenderFrame;
+import jo.sm.ui.act.GenericAction;
 import jo.sm.ui.logic.ShipSpec;
 import jo.vecmath.Point3i;
 

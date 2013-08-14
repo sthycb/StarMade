@@ -14,12 +14,21 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
 import jo.sm.logic.StarMadeLogic;
-import jo.sm.ui.act.HardenAction;
-import jo.sm.ui.act.OpenExistingAction;
-import jo.sm.ui.act.OpenFileAction;
-import jo.sm.ui.act.SaveAction;
-import jo.sm.ui.act.SmoothAction;
-import jo.sm.ui.act.SoftenAction;
+import jo.sm.ui.act.edit.HardenAction;
+import jo.sm.ui.act.edit.SmoothAction;
+import jo.sm.ui.act.edit.SoftenAction;
+import jo.sm.ui.act.file.OpenExistingAction;
+import jo.sm.ui.act.file.OpenFileAction;
+import jo.sm.ui.act.file.SaveAction;
+import jo.sm.ui.act.view.FilterMissileDumbAction;
+import jo.sm.ui.act.view.FilterMissileFafoAction;
+import jo.sm.ui.act.view.FilterMissileHeatAction;
+import jo.sm.ui.act.view.FilterNoneAction;
+import jo.sm.ui.act.view.FilterPowerAction;
+import jo.sm.ui.act.view.FilterRepairAction;
+import jo.sm.ui.act.view.FilterSalvageAction;
+import jo.sm.ui.act.view.FilterThrusterAction;
+import jo.sm.ui.act.view.FilterWeaponsAction;
 import jo.sm.ui.logic.ShipSpec;
 
 @SuppressWarnings("serial")
@@ -36,6 +45,8 @@ public class RenderFrame extends JFrame implements WindowListener
         JMenuBar menuBar = new JMenuBar();
         JMenu menuFile = new JMenu("File");
         JMenu menuEdit = new JMenu("Edit");
+        JMenu menuView = new JMenu("View");
+        JMenu menuViewMissiles = new JMenu("Missiles");
         mClient = new RenderPanel();
         // layout
         setJMenuBar(menuBar);
@@ -47,6 +58,17 @@ public class RenderFrame extends JFrame implements WindowListener
         menuEdit.add(new SmoothAction(this));
         menuEdit.add(new HardenAction(this));
         menuEdit.add(new SoftenAction(this));
+        menuBar.add(menuView);
+        menuView.add(new FilterNoneAction(this));
+        menuView.add(new FilterPowerAction(this));
+        menuView.add(new FilterThrusterAction(this));
+        menuView.add(new FilterRepairAction(this));
+        menuView.add(new FilterSalvageAction(this));
+        menuView.add(new FilterWeaponsAction(this));
+        menuView.add(menuViewMissiles);
+        menuViewMissiles.add(new FilterMissileDumbAction(this));
+        menuViewMissiles.add(new FilterMissileHeatAction(this));
+        menuViewMissiles.add(new FilterMissileFafoAction(this));
         getContentPane().add(BorderLayout.WEST, new EditPanel(mClient));
         getContentPane().add(BorderLayout.CENTER, mClient);
         getContentPane().add(BorderLayout.SOUTH, new BegPanel());

@@ -1,4 +1,4 @@
-package jo.sm.ui.act;
+package jo.sm.ui.act.file;
 
 import java.awt.event.ActionEvent;
 
@@ -6,6 +6,7 @@ import jo.sm.data.SparseMatrix;
 import jo.sm.ship.data.Block;
 import jo.sm.ui.RenderFrame;
 import jo.sm.ui.ShipChooser;
+import jo.sm.ui.act.GenericAction;
 import jo.sm.ui.logic.ShipSpec;
 import jo.sm.ui.logic.ShipTreeLogic;
 

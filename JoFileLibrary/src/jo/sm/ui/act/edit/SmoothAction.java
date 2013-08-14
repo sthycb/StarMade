@@ -1,4 +1,4 @@
-package jo.sm.ui.act;
+package jo.sm.ui.act.edit;
 
 import java.awt.event.ActionEvent;
 
@@ -6,6 +6,7 @@ import jo.sm.data.SparseMatrix;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.logic.SmoothLogic;
 import jo.sm.ui.RenderFrame;
+import jo.sm.ui.act.GenericAction;
 
 @SuppressWarnings("serial")
 public class SmoothAction extends GenericAction

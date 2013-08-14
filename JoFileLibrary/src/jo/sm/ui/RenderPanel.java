@@ -10,7 +10,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Path2D;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -35,6 +37,8 @@ public class RenderPanel extends JPanel
     private Point               mMouseDownAt;
     
     private SparseMatrix<Block> mGrid;
+    private SparseMatrix<Block> mFilteredGrid;
+    private Set<Short>          mFilter;
     private List<RenderTile>    mTiles;
     private Matrix4f            mTransform;
     private Vector3f            mPreTranslate;
@@ -361,7 +365,25 @@ public class RenderPanel extends JPanel
         mScale = maxScreen/maxModel/2f;
         System.out.println("Scale="+mScale+", preTrans="+mPreTranslate);
         //mTransform.setTranslation(new Vector3f(s.width/2f, s.height/2f, 0));
-        mTiles = RenderLogic.getRender(grid);
+        updateTiles();
+    }
+    
+    private void updateTiles()
+    {
+        if ((mFilter == null) || (mFilter.size() == 0))
+            mFilteredGrid = mGrid;
+        else
+        {
+            mFilteredGrid = new SparseMatrix<Block>();
+            for (Iterator<Point3i> i = mGrid.iterator(); i.hasNext(); )
+            {
+                Point3i p = i.next();
+                Block b = mGrid.get(p);
+                if ((b != null) && mFilter.contains(b.getBlockID()))
+                    mFilteredGrid.set(p, b);
+            }
+        }
+        mTiles = RenderLogic.getRender(mFilteredGrid);
         updateTransform();
     }
     
@@ -385,5 +407,16 @@ public class RenderPanel extends JPanel
                 return tile;
         }
         return null;
+    }
+
+    public Set<Short> getFilter()
+    {
+        return mFilter;
+    }
+
+    public void setFilter(Set<Short> filter)
+    {
+        mFilter = filter;
+        updateTiles();
     }
 }
