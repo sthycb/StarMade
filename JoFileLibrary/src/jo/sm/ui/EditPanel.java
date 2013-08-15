@@ -1,23 +1,30 @@
 package jo.sm.ui;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import jo.sm.data.BlockTypes;
 import jo.sm.data.RenderTile;
 import jo.sm.data.SparseMatrix;
+import jo.sm.logic.StarMadeLogic;
+import jo.sm.mods.IBlocksPlugin;
 import jo.sm.ship.data.Block;
+import jo.sm.ui.act.plugin.BlocksPluginAction;
 import jo.vecmath.Point3i;
 
 @SuppressWarnings("serial")
@@ -40,6 +47,7 @@ public class EditPanel extends JPanel
     private JButton             mWhite;
     private JButton             mClear;
     private JButton             mAll;
+    private JButton             mPlugins;
 
     public EditPanel(RenderPanel renderer)
     {
@@ -60,6 +68,8 @@ public class EditPanel extends JPanel
         mClear.setToolTipText("Stop painting");
         mAll = new JButton("All");
         mAll.setToolTipText("Set all hulls to current color");
+        mPlugins = new JButton("Mods");
+        mPlugins.setToolTipText("Invoke a mod");
         // layout
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(new JLabel("Paint:"));
@@ -76,6 +86,7 @@ public class EditPanel extends JPanel
         add(mWhite);
         add(mClear);
         add(mAll);
+        add(mPlugins);
         // link
         MouseAdapter ma = new MouseAdapter() {
             public void mouseClicked(MouseEvent e)
@@ -112,6 +123,12 @@ public class EditPanel extends JPanel
             {
                 doColorAll();
             }});
+        mPlugins.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                doPlugin();
+            }});
     }
 
     private JButton newButton(final short blockID)
@@ -127,6 +144,23 @@ public class EditPanel extends JPanel
                 doColorClick(btn.getIcon(), blockID);
             }});
         return btn;
+    }
+    
+    private void doPlugin()
+    {
+        int classification = mRenderer.getSpec().getClassification();
+        List<IBlocksPlugin> plugins = StarMadeLogic.getBlocksPlugins(classification, IBlocksPlugin.SUBTYPE_PAINT);
+        if (plugins.size() == 0)
+            return;
+        JPopupMenu popup = new JPopupMenu();
+        for (IBlocksPlugin plugin : plugins)
+        {
+            BlocksPluginAction action = new BlocksPluginAction(mRenderer, plugin);
+            JMenuItem men = new JMenuItem(action);
+            popup.add(men);
+        }
+        Dimension d = mPlugins.getSize();
+        popup.show(mPlugins, d.width, d.height);
     }
     
     private void doColorClick(Icon color, short blockID)

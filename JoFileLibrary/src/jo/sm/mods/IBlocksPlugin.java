@@ -11,7 +11,8 @@ public interface IBlocksPlugin extends IStarMadePlugin
     public static final int TYPE_PLANET = 4;
     public static final int TYPE_FLOATINGROCK = 5;
 
-    public static final int SUBTYPE_SHIP_PAINT = 1;
+    public static final int SUBTYPE_PAINT = 1;
+    public static final int SUBTYPE_MODIFY = 2;
 
     public SparseMatrix<Block> modify(SparseMatrix<Block> original, Object params);
 }

@@ -20,7 +20,7 @@ public class StripesParameters
     {
         mColor1 = BlockTypes.HULL_COLOR_BLACK_ID;
         mColor2 = BlockTypes.HULL_COLOR_WHITE_ID;
-        mXAxis = false;
+        mXAxis = true;
         mXWidth1 = 1;
         mXWidth2 = 1;
         mYAxis = false;

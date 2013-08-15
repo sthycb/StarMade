@@ -21,6 +21,7 @@ import jo.sm.data.RenderTile;
 import jo.sm.data.SparseMatrix;
 import jo.sm.logic.RenderLogic;
 import jo.sm.ship.data.Block;
+import jo.sm.ui.logic.ShipSpec;
 import jo.vecmath.Matrix3f;
 import jo.vecmath.Matrix4f;
 import jo.vecmath.Point3f;
@@ -36,6 +37,7 @@ public class RenderPanel extends JPanel
     
     private Point               mMouseDownAt;
     
+    private ShipSpec            mSpec;
     private SparseMatrix<Block> mGrid;
     private SparseMatrix<Block> mFilteredGrid;
     private Set<Short>          mFilter;
@@ -418,5 +420,15 @@ public class RenderPanel extends JPanel
     {
         mFilter = filter;
         updateTiles();
+    }
+
+    public ShipSpec getSpec()
+    {
+        return mSpec;
+    }
+
+    public void setSpec(ShipSpec spec)
+    {
+        mSpec = spec;
     }
 }

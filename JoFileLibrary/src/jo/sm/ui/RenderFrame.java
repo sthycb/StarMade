@@ -6,20 +6,26 @@ import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import jo.sm.logic.StarMadeLogic;
+import jo.sm.mods.IBlocksPlugin;
 import jo.sm.ui.act.edit.HardenAction;
 import jo.sm.ui.act.edit.SmoothAction;
 import jo.sm.ui.act.edit.SoftenAction;
 import jo.sm.ui.act.file.OpenExistingAction;
 import jo.sm.ui.act.file.OpenFileAction;
 import jo.sm.ui.act.file.SaveAction;
+import jo.sm.ui.act.plugin.BlocksPluginAction;
 import jo.sm.ui.act.view.FilterMissileDumbAction;
 import jo.sm.ui.act.view.FilterMissileFafoAction;
 import jo.sm.ui.act.view.FilterMissileHeatAction;
@@ -35,7 +41,6 @@ import jo.sm.ui.logic.ShipSpec;
 public class RenderFrame extends JFrame implements WindowListener
 {
     private ShipSpec    mSpec;
-    
     private RenderPanel mClient;
 
     public RenderFrame()
@@ -46,6 +51,7 @@ public class RenderFrame extends JFrame implements WindowListener
         JMenu menuFile = new JMenu("File");
         JMenu menuEdit = new JMenu("Edit");
         JMenu menuView = new JMenu("View");
+        JMenu menuModify = new JMenu("Modify");
         JMenu menuViewMissiles = new JMenu("Missiles");
         mClient = new RenderPanel();
         // layout
@@ -69,10 +75,26 @@ public class RenderFrame extends JFrame implements WindowListener
         menuViewMissiles.add(new FilterMissileDumbAction(this));
         menuViewMissiles.add(new FilterMissileHeatAction(this));
         menuViewMissiles.add(new FilterMissileFafoAction(this));
+        menuBar.add(menuModify);
         getContentPane().add(BorderLayout.WEST, new EditPanel(mClient));
         getContentPane().add(BorderLayout.CENTER, mClient);
         getContentPane().add(BorderLayout.SOUTH, new BegPanel());
         // link
+        menuModify.addMenuListener(new MenuListener() {            
+            @Override
+            public void menuSelected(MenuEvent ev)
+            {
+                updateModify((JMenu)ev.getSource());
+            }            
+            @Override
+            public void menuDeselected(MenuEvent e)
+            {
+            }            
+            @Override
+            public void menuCanceled(MenuEvent e)
+            {
+            }
+        });
         this.addWindowListener(this);
         setSize(1024, 768);
     }
@@ -106,6 +128,23 @@ public class RenderFrame extends JFrame implements WindowListener
 
     public void windowDeactivated(WindowEvent evt)
     {
+    }
+
+    private void updateModify(JMenu modify)
+    {
+        modify.removeAll();
+        if (mSpec == null)
+            return;
+        int type = mSpec.getClassification();
+        List<IBlocksPlugin> plugins = StarMadeLogic.getBlocksPlugins(type, IBlocksPlugin.SUBTYPE_MODIFY);
+        if (plugins.size() == 0)
+            return;
+        for (IBlocksPlugin plugin : plugins)
+        {
+            BlocksPluginAction action = new BlocksPluginAction(mClient, plugin);
+            JMenuItem menu = new JMenuItem(action);
+            modify.add(menu);
+        }
     }
     
     private static Properties loadProps()
@@ -172,6 +211,7 @@ public class RenderFrame extends JFrame implements WindowListener
     public void setSpec(ShipSpec spec)
     {
         mSpec = spec;
+        mClient.setSpec(mSpec);
     }
 
     public RenderPanel getClient()

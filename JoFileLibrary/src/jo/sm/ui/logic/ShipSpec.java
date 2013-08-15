@@ -11,6 +11,7 @@ public class ShipSpec
     public static final int ENTITY = 2;
     public static final int FILE = 3;
     
+    private int mClassification;
     private int mType;
     private String mName;
     private Entity mEntity;
@@ -56,5 +57,15 @@ public class ShipSpec
     public void setFile(File file)
     {
         mFile = file;
+    }
+
+    public int getClassification()
+    {
+        return mClassification;
+    }
+
+    public void setClassification(int classification)
+    {
+        mClassification = classification;
     }
 }

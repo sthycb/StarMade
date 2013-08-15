@@ -14,7 +14,9 @@ public class StripesPlugin implements IBlocksPlugin
     public static final String AUTH = "Jo Jaquinta";
     public static final int[][] CLASSIFICATIONS = 
         {
-        { TYPE_SHIP, SUBTYPE_SHIP_PAINT },
+        { TYPE_SHIP, SUBTYPE_PAINT },
+        { TYPE_STATION, SUBTYPE_PAINT },
+        { TYPE_SHOP, SUBTYPE_PAINT },
         };
 
     @Override
@@ -52,6 +54,10 @@ public class StripesPlugin implements IBlocksPlugin
             Object p)
     {
         StripesParameters params = (StripesParameters)p;
+        System.out.println("Params: color1="+params.getColor1()+", color2="+params.getColor2()
+                +", X="+params.isXAxis()+","+params.getXWidth1()+","+params.getXWidth2()
+                +", Y="+params.isYAxis()+","+params.getYWidth1()+","+params.getYWidth2()
+                +", Z="+params.isZAxis()+","+params.getZWidth1()+","+params.getZWidth2());
         Point3i lower = new Point3i();
         Point3i upper = new Point3i();
         original.getBounds(lower, upper);
@@ -62,9 +68,8 @@ public class StripesPlugin implements IBlocksPlugin
             Block b = original.get(xyz);
             if (b == null)
                 continue;
-            if (!BlockTypes.isAnyHull(b.getBlockID()))
-                continue;
-            b = modify(xyz, b, params);
+            if (BlockTypes.isAnyHull(b.getBlockID()))
+                b = modify(xyz, b, params);
             modified.set(xyz, b);
         }
         return modified;
@@ -81,13 +86,13 @@ public class StripesPlugin implements IBlocksPlugin
         }
         if (params.isYAxis())
         {
-            int off = mod(xyz.x, params.getYWidth1() + params.getYWidth2());
+            int off = mod(xyz.y, params.getYWidth1() + params.getYWidth2());
             if (off < params.getYWidth1())
                 color = !color;
         }
         if (params.isZAxis())
         {
-            int off = mod(xyz.x, params.getZWidth1() + params.getZWidth2());
+            int off = mod(xyz.z, params.getZWidth1() + params.getZWidth2());
             if (off < params.getZWidth1())
                 color = !color;
         }

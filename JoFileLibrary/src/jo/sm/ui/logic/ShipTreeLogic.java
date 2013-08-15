@@ -8,6 +8,7 @@ import jo.sm.data.Entity;
 import jo.sm.data.SparseMatrix;
 import jo.sm.logic.BlueprintLogic;
 import jo.sm.logic.EntityLogic;
+import jo.sm.mods.IBlocksPlugin;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Blueprint;
 import jo.sm.ship.logic.ShipLogic;
@@ -44,6 +45,7 @@ public class ShipTreeLogic
         {
             ShipSpec spec = new ShipSpec();
             spec.setType(def ? ShipSpec.DEFAULT_BLUEPRINT : ShipSpec.BLUEPRINT);
+            spec.setClassification(IBlocksPlugin.TYPE_SHIP);
             spec.setName(name);
             DefaultMutableTreeNode option = new DefaultMutableTreeNode(spec);
             group.add(option);            
@@ -74,6 +76,7 @@ public class ShipTreeLogic
                 }
                 ShipSpec spec = new ShipSpec();
                 spec.setType(ShipSpec.ENTITY);
+                determineClassification(spec, e);
                 spec.setName(e.toString());
                 spec.setEntity(e);
                 DefaultMutableTreeNode option = new DefaultMutableTreeNode(spec);
@@ -88,6 +91,20 @@ public class ShipTreeLogic
         if (!addedAny)
             return;
         root.add(group);
+    }
+
+    private static void determineClassification(ShipSpec spec, Entity e)
+    {
+        String fname = e.getFile().getName();
+        if (fname.indexOf("_SHIP_") >= 0)
+            spec.setClassification(IBlocksPlugin.TYPE_SHIP);
+        else if (fname.indexOf("_FLOATINGROCK_") >= 0)
+            spec.setClassification(IBlocksPlugin.TYPE_FLOATINGROCK);
+        else if (fname.indexOf("_SHOP_") >= 0)
+            spec.setClassification(IBlocksPlugin.TYPE_SHOP);
+        else if (fname.indexOf("_SPACESTATION_") >= 0)
+            spec.setClassification(IBlocksPlugin.TYPE_STATION);
+        
     }
 
     public static SparseMatrix<Block> loadShip(ShipSpec spec)

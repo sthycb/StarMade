@@ -1,2 +1,3 @@
 Manifest-Version: 1.0
 BlocksPlugins: jo.sm.plugins.ship.stripes.StripesPlugin
+BlocksPlugins: jo.sm.plugins.planet.hollow.HollowPlugin

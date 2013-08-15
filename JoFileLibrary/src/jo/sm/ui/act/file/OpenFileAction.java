@@ -12,6 +12,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import jo.sm.data.SparseMatrix;
 import jo.sm.logic.StarMadeLogic;
+import jo.sm.mods.IBlocksPlugin;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Data;
 import jo.sm.ship.logic.DataLogic;
@@ -53,6 +54,7 @@ public class OpenFileAction extends GenericAction
                SparseMatrix<Block> grid = ShipLogic.getBlocks(data);
                ShipSpec spec = new ShipSpec();
                spec.setType(ShipSpec.FILE);
+               spec.setClassification(IBlocksPlugin.TYPE_SHIP); // TODO: autodetect
                spec.setFile(smb2);
                mFrame.setSpec(spec);
                mFrame.getClient().setGrid(grid);
