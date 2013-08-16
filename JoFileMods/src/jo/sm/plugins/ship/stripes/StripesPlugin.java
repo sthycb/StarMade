@@ -54,10 +54,10 @@ public class StripesPlugin implements IBlocksPlugin
             Object p)
     {
         StripesParameters params = (StripesParameters)p;
-        System.out.println("Params: color1="+params.getColor1()+", color2="+params.getColor2()
-                +", X="+params.isXAxis()+","+params.getXWidth1()+","+params.getXWidth2()
-                +", Y="+params.isYAxis()+","+params.getYWidth1()+","+params.getYWidth2()
-                +", Z="+params.isZAxis()+","+params.getZWidth1()+","+params.getZWidth2());
+        //System.out.println("Params: color1="+params.getColor1()+", color2="+params.getColor2()
+        //        +", X="+params.isXAxis()+","+params.getXWidth1()+","+params.getXWidth2()
+        //        +", Y="+params.isYAxis()+","+params.getYWidth1()+","+params.getYWidth2()
+        //        +", Z="+params.isZAxis()+","+params.getZWidth1()+","+params.getZWidth2());
         Point3i lower = new Point3i();
         Point3i upper = new Point3i();
         original.getBounds(lower, upper);

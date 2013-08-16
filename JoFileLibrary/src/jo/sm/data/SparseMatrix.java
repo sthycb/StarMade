@@ -109,4 +109,55 @@ public class SparseMatrix<T>
         getBounds(lower, upper);
         return new CubeIterator(lower, upper);
     }
+    
+    public Iterator<Point3i> iteratorNonNull()
+    {
+        return new NonNullIterator();
+    }
+    
+    class NonNullIterator implements Iterator<Point3i>
+    {
+        private Iterator<Point3i> mRootIterator;
+        private Point3i mNext;
+        
+        public NonNullIterator()
+        {
+            mRootIterator = iterator();
+            advance();
+        }
+        
+        private void advance()
+        {
+            while (mRootIterator.hasNext())
+            {
+                Point3i n = mRootIterator.next();
+                if (contains(n))
+                {
+                    mNext = n;
+                    return;
+                }
+            }
+            mNext = null;
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return mNext != null;
+        }
+
+        @Override
+        public Point3i next()
+        {
+            Point3i next = mNext;
+            advance();
+            return next;
+        }
+
+        @Override
+        public void remove()
+        {
+        }
+        
+    }
 }
