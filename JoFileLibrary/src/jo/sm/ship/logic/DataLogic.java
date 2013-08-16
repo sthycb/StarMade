@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import jo.sm.logic.ByteUtils;
-import jo.sm.logic.FileUtils;
 import jo.sm.logic.IOLogic;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Chunk;
@@ -115,20 +113,20 @@ public class DataLogic
         if (close)
             dis.close();
         // cross check
-//        for (int z = 0; z < 16; z++)
-//            for (int y = 0; y < 16; y++)
-//                for (int x = 0; x < 16; x++)
-//                {
-//                    int off = offsetSizeTable[x][y][z][0];
-//                    int siz = offsetSizeTable[x][y][z][1];
-//                    long ts = timestampTable[x][y][z];
-//                    if (off < 0)
-//                        continue;
+        for (int z = 0; z < 16; z++)
+            for (int y = 0; y < 16; y++)
+                for (int x = 0; x < 16; x++)
+                {
+                    int off = offsetSizeTable[x][y][z][0];
+                    int siz = offsetSizeTable[x][y][z][1];
+                    long ts = timestampTable[x][y][z];
+                    if (off < 0)
+                        continue;
 //                    System.out.print(off+" x"+siz+" ");
-//                    Chunk chunk = data.getChunks()[off];
-//                    System.out.println("idx="+x+","+y+","+z+" -> "+chunk.getPosition());
+                    Chunk chunk = data.getChunks()[off];
+                    System.out.println("idx="+x+","+y+","+z+" -> "+chunk.getPosition());
 //                    System.out.println("     "+ts+" -> "+chunk.getTimestamp());
-//                }
+                }
 		return data;
 	}
     
@@ -240,15 +238,15 @@ public class DataLogic
         {
             File dataFile = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2");
             // TEST
+            /*
             byte[] original = FileUtils.readFile(dataFile.toString());
-            String oTxt = ByteUtils.toStringDump(original);
+            //String oTxt = ByteUtils.toStringDump(original);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             writeFile(data.get(p), baos, true);
             byte[] save = baos.toByteArray();
             String sTxt = ByteUtils.toStringDump(save);
             if (oTxt.equals(sTxt))
                 System.out.println("Identical");
-            /*
             else
             {
                 StringTokenizer oST = new StringTokenizer(oTxt, "\r\n");
@@ -264,7 +262,6 @@ public class DataLogic
                     }
                 }
             }
-            */
             try
             {
                 readFile(new ByteArrayInputStream(save), true);
@@ -274,6 +271,7 @@ public class DataLogic
                 e.printStackTrace();
                 return;
             }
+            */
             if (dataFile.exists())
             {
                 File dest = new File(baseDir, baseName+"."+p.x+"."+p.y+"."+p.z+".smd2.bak");

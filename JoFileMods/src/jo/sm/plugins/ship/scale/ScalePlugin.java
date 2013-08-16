@@ -1,4 +1,4 @@
-package jo.sm.plugins.ship.rotate;
+package jo.sm.plugins.ship.scale;
 
 import java.util.Iterator;
 
@@ -10,14 +10,16 @@ import jo.vecmath.Point3f;
 import jo.vecmath.Point3i;
 import jo.vecmath.logic.Transform;
 
-public class RotatePlugin implements IBlocksPlugin
+public class ScalePlugin implements IBlocksPlugin
 {
-    public static final String NAME = "Rotate";
-    public static final String DESC = "Rotate ship around the core.";
+    public static final String NAME = "Scale";
+    public static final String DESC = "Scale ship's size.";
     public static final String AUTH = "Jo Jaquinta";
     public static final int[][] CLASSIFICATIONS = 
         {
         { TYPE_SHIP, SUBTYPE_MODIFY },
+        { TYPE_STATION, SUBTYPE_MODIFY },
+        { TYPE_SHOP, SUBTYPE_MODIFY },
         };
 
     @Override
@@ -41,7 +43,7 @@ public class RotatePlugin implements IBlocksPlugin
     @Override
     public Object getParameterBean()
     {
-        return new RotateParameters();
+        return new ScaleParameters();
     }
 
     @Override
@@ -54,16 +56,22 @@ public class RotatePlugin implements IBlocksPlugin
     public SparseMatrix<Block> modify(SparseMatrix<Block> original,
             Object p)
     {
-        RotateParameters params = (RotateParameters)p;        
+        ScaleParameters params = (ScaleParameters)p;        
         //System.out.println("Params: X="+params.getXRotate()
         //        +", Y="+params.getYRotate()
         //        +", Z="+params.getZRotate());
+        if (params.getXScale() < 1)
+            params.setXScale(1);
+        if (params.getYScale() < 1)
+            params.setYScale(1);
+        if (params.getZScale() < 1)
+            params.setZScale(1);
         Point3i core = findCore(original);
         System.out.println("  Core at "+core);
         Transform t = new Transform();
         t.setIdentity();
         t.translate(-core.x, -core.y, -core.z);
-        t.rotateEuler(params.getXRotate(), params.getYRotate(), params.getZRotate());
+        t.scale(params.getXScale(), params.getYScale(), params.getZScale());
         t.translate(core.x, core.y, core.z);
         SparseMatrix<Block> modified = new SparseMatrix<Block>();
         for (Iterator<Point3i> i = original.iteratorNonNull(); i.hasNext(); )
@@ -72,8 +80,20 @@ public class RotatePlugin implements IBlocksPlugin
             Block b = original.get(xyz);
             Point3f fPoint = new Point3f(xyz.x, xyz.y, xyz.z);
             t.transform(fPoint);
+            Point3i iPoint = new Point3i(toInt(fPoint.x), toInt(fPoint.y), toInt(fPoint.z));
             //System.out.println("  "+xyz+" -> "+fPoint);
-            modified.set(toInt(fPoint.x), toInt(fPoint.y), toInt(fPoint.z), b);
+            modified.set(iPoint, b);
+            if (b.getBlockID() != BlockTypes.CORE_ID)
+            {
+                for (int x = 0; x < params.getXScale(); x++)
+                    for (int y = 0; y < params.getYScale(); y++)
+                        for (int z = 0; z < params.getZScale(); z++)
+                            if ((x != 0) || (y != 0) || (z != 0))
+                            {
+                                Block newB = new Block(b);
+                                modified.set(iPoint.x + x, iPoint.y + y, iPoint.z + z, newB);
+                            }
+            }
         }
         return modified;
     }
