@@ -24,6 +24,7 @@ import jo.sm.ui.act.edit.SmoothAction;
 import jo.sm.ui.act.edit.SoftenAction;
 import jo.sm.ui.act.file.OpenExistingAction;
 import jo.sm.ui.act.file.OpenFileAction;
+import jo.sm.ui.act.file.QuitAction;
 import jo.sm.ui.act.file.SaveAction;
 import jo.sm.ui.act.plugin.BlocksPluginAction;
 import jo.sm.ui.act.view.FilterMissileDumbAction;
@@ -60,6 +61,7 @@ public class RenderFrame extends JFrame implements WindowListener
         menuFile.add(new OpenExistingAction(this));
         menuFile.add(new OpenFileAction(this));
         menuFile.add(new SaveAction(this));
+        menuFile.add(new QuitAction(this));
         menuBar.add(menuEdit);
         menuEdit.add(new SmoothAction(this));
         menuEdit.add(new HardenAction(this));
