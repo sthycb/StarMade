@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
+import jo.sm.ent.data.ControlElement;
+import jo.sm.ent.data.ControlElementMap;
+import jo.sm.ent.data.ControlSubElement;
 import jo.sm.ent.data.Tag;
 import jo.sm.ent.data.TagType;
 import jo.sm.logic.DebugLogic;
@@ -188,28 +191,62 @@ public class TagLogic
             case SERIALIZABLE:
             {
                 DebugLogic.debug("Reading Serializable");
-                List<Tag> tagbuf = new ArrayList<Tag>();
-                for (;;)
+                ControlElementMap map = new ControlElementMap();
+                map.setFactory(dis.readByte());
+                int controlElementMapperSize = dis.readInt();
+                for (int i = 0; i < controlElementMapperSize; i++)
                 {
-                    byte st = dis.readByte();
-                    TagType subtype = TagType.values()[st]; 
-                    if (subtype == TagType.FINISH)
+                    ControlElement ele = new ControlElement();
+                    short index1 = dis.readShort();
+                    short index2 = dis.readShort();
+                    short index3 = dis.readShort();
+                    ele.setIndex(shortToIndex(index1, index2, index3));
+                    int size2 = dis.readInt();
+                    for (int j = 0; j < size2; j++)
                     {
-                        tagbuf.add(new Tag());
-                        break;
+                        ControlSubElement sub = new ControlSubElement();
+                        sub.setVal(dis.readShort());
+                        int size3 = dis.readInt();
+                        for (int k = 0; k < size3; k++)
+                        {
+                            Point3i p = new Point3i();
+                            p.x = dis.readShort();
+                            p.y = dis.readShort();
+                            p.z = dis.readShort();
+                            sub.getVals().add(p);
+                        }
+                        ele.getElements().add(sub);
                     }
-                    String name = dis.readUTF();
-                    DebugLogic.debug("Reading element #"+(tagbuf.size() + 1)+" "+name+" ("+subtype+")");
-                    Object val = readValue(dis, subtype);
-                    Tag t = new Tag(subtype, name, val);
-                    tagbuf.add(t);
+                    map.getElements().add(ele);
                 }
-                value = tagbuf.toArray(new Tag[0]);
+                value = map;
                 break;
             }
         }
         DebugLogic.outdent();
         return value;
+    }
+
+    private static short[] indexToShort(long index)
+    {
+      long l1 = index / 4294705156L;
+      long l2 = (index -= l1 * 4294705156L) / 65534L;
+      index -= l2 * 65534L;
+      short[] ret = new short[3];
+      ret[0] = (short)(int)(index - 32767L);
+      ret[1] = (short)(int)(l2 - 32767L);
+      ret[2] = (short)(int)(l1 - 32767L);
+      return ret;
+    }
+    
+    public static long shortToIndex(int paramInt1, int paramInt2, int paramInt3)
+    {
+      long l1 = paramInt1 + 32767;
+      long l2 = paramInt2 + 32767;
+      long l3;
+      if ((l3 = (paramInt3 + 32767) * 4294705156L + l2 * 65534L + l1) < 0L)
+        throw new IllegalArgumentException("ElementCollection Index out of bounds: " + paramInt1 + ", " + paramInt2 + ", " + paramInt3 + " -> " + l3);
+      return l3;
     }
 
 
@@ -302,14 +339,26 @@ public class TagLogic
             }
             case SERIALIZABLE:
             {
-                Tag[] tagbuf = (Tag[])tag.getValue();
-                for (Tag t : tagbuf)
+                ControlElementMap map = (ControlElementMap)tag.getValue();
+                dos.writeByte(map.getFactory());
+                dos.writeInt(map.getElements().size());
+                for (ControlElement ele : map.getElements())
                 {
-                    dos.writeByte(t.getType().ordinal());
-                    if (t.getType() != TagType.FINISH)
+                    short[] index = indexToShort(ele.getIndex());
+                    dos.writeShort(index[0]);
+                    dos.writeShort(index[1]);
+                    dos.writeShort(index[2]);
+                    dos.writeInt(ele.getElements().size());
+                    for (ControlSubElement sub : ele.getElements())
                     {
-                        dos.writeUTF(t.getName() == null ? "null" : t.getName());
-                        writeValue(t, dos);
+                        dos.writeShort(sub.getVal());
+                        dos.writeInt(sub.getVals().size());
+                        for (Point3i p : sub.getVals())
+                        {
+                            dos.writeShort(p.x);
+                            dos.writeShort(p.y);
+                            dos.writeShort(p.z);
+                        }
                     }
                 }
                 return;
@@ -385,7 +434,7 @@ public class TagLogic
                     throw new IllegalArgumentException();
                 break;
             case SERIALIZABLE:
-                if (!(value instanceof Tag[]))
+                if (!(value instanceof ControlElementMap))
                     throw new IllegalArgumentException();
                 break;
             default:

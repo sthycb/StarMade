@@ -1,7 +1,11 @@
 package jo.sm.ent.logic;
 
+import jo.sm.ent.data.ControlElement;
+import jo.sm.ent.data.ControlElementMap;
+import jo.sm.ent.data.ControlSubElement;
 import jo.sm.ent.data.Tag;
 import jo.sm.ent.data.TagType;
+import jo.vecmath.Point3i;
 
 public class TagUtils {
 	
@@ -41,12 +45,17 @@ public class TagUtils {
             case SERIALIZABLE:
             {
                 System.out.println();
-                Tag[] val = (Tag[])obj.getValue();
-                for (int i = 0; i < val.length; i++)
-                    if (val[i].getType() == TagType.FINISH)
-                        break;
-                    else
-                        dump(val[i], prefix+"  ");
+                ControlElementMap map = (ControlElementMap)obj.getValue();
+                for (ControlElement ele : map.getElements())
+                {
+                    System.out.println(prefix+"Index:"+ele.getIndex());
+                    for (ControlSubElement sub : ele.getElements())
+                    {
+                        System.out.println(prefix+"  ElementID:"+sub.getVal());
+                        for (Point3i p : sub.getVals())
+                            System.out.println(prefix+"    "+p);
+                    }
+                }
                 System.out.print(prefix);
                 break;
             }
