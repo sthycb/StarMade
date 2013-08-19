@@ -104,7 +104,7 @@ public class BegPanel extends JPanel
     private static final String MESSAGE = "This software is made freely available with no charge or limitation. "
             + "Even the source is included. "
             + "It is distributed as \"begware\", and here is the begging. "
-            + "If you like and use this softawre, please go and download my audiobook \"The Raider's Lament\". "
+            + "If you like and use this software, please go and download my audiobook \"The Raider's Lament\". "
             + "It's a light hearted Sci-Fi novel that's a fun waste of time. "
             + "You don't have to actually listen to it. "
             + "(The recording is not the best.) "

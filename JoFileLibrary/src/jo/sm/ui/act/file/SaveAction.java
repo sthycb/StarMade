@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import jo.sm.data.SparseMatrix;
+import jo.sm.logic.StarMadeLogic;
 import jo.sm.ship.data.Block;
 import jo.sm.ship.data.Data;
 import jo.sm.ship.logic.DataLogic;
@@ -34,6 +35,10 @@ public class SaveAction extends GenericAction
             return;
         if (mFrame.getSpec().getType() == ShipSpec.FILE)
             doSaveFile();
+        else if (mFrame.getSpec().getType() == ShipSpec.BLUEPRINT)
+            doSaveBlueprint(false);
+        else if (mFrame.getSpec().getType() == ShipSpec.DEFAULT_BLUEPRINT)
+            doSaveBlueprint(true);
         else if (mFrame.getSpec().getType() == ShipSpec.ENTITY)
             doSaveEntity();
     }
@@ -41,6 +46,23 @@ public class SaveAction extends GenericAction
     private void doSaveFile()
     {
         
+    }
+    
+    private void doSaveBlueprint(boolean def)
+    {
+        SparseMatrix<Block> grid = mFrame.getClient().getGrid();
+        Map<Point3i, Data> data = ShipLogic.getData(grid);
+        File bpDir = new File(StarMadeLogic.getInstance().getBaseDir(), def ? "blueprints-default" : "blueprints");
+        File baseDir = new File(bpDir, mFrame.getSpec().getName());
+        File dataDir = new File(baseDir, "DATA");
+        try
+        {
+            DataLogic.writeFiles(data, dataDir, mFrame.getSpec().getName());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }        
     }
     
     private void doSaveEntity()

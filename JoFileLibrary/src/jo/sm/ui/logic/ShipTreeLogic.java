@@ -47,6 +47,7 @@ public class ShipTreeLogic
             spec.setType(def ? ShipSpec.DEFAULT_BLUEPRINT : ShipSpec.BLUEPRINT);
             spec.setClassification(IBlocksPlugin.TYPE_SHIP);
             spec.setName(name);
+            spec.setClassification(IBlocksPlugin.TYPE_SHIP);
             DefaultMutableTreeNode option = new DefaultMutableTreeNode(spec);
             group.add(option);            
         }
