@@ -1,6 +1,10 @@
 *.class
 
+instance
+tmp
+source
+workspace
+
 # Package Files #
-*.jar
 *.war
 *.ear
